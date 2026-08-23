@@ -22,17 +22,9 @@ st.set_page_config(
 )
 
 
-# Load the JSON file and extract values
-file_name = 'config.json'
-with open(file_name, 'r') as file:
-    config = json.load(file)
-    OPENAI_API_KEY = config.get("OPENAI_API_KEY") # Loading the API Key
-    OPENAI_API_BASE = config.get("OPENAI_API_BASE") # Loading the API Base Url
-
-
 # Storing API credentials in environment variables
-os.environ['OPENAI_API_KEY'] = OPENAI_API_KEY
-os.environ["OPENAI_BASE_URL"] = OPENAI_API_BASE
+os.environ['OPENAI_API_KEY'] = st.secrets["OPEN_API_KEY"]
+os.environ["OPENAI_BASE_URL"] = st.secrets["OPENAI_BASE"]
 
 # ── LLMs ─────────────────────────────────────────────────────────────────────
 @st.cache_resource
@@ -109,7 +101,7 @@ Follow the ReAct pattern strictly:
   Final Answer: <short, polite, conversational reply — no greetings, no sign-off>
 
 Policy rules (apply before writing Final Answer):
-  - If Actual Delivery has a date, that means the order has been delivered on that particular date  
+  - If Actual Delivery has a date, that means the order has been delivered on that particular date
   - If actual_delivery is null, the order has not been delivered yet — do not mention return/replacement eligibility.
   - Share tracking details if the user has some doubts regarding the delivery of the order
   - Only mention return or replacement terms when the customer explicitly asks, and calculate whether that is possible and respond accordingly.
@@ -223,7 +215,7 @@ Query: {state['query']}"""
     intent = match.group(0) if match else "3"
 
     return {"intent": intent}
-    
+
 def router_node(state: OrderState):
     return "order_agent" if state["intent"] == "2" else "exit_node"
 
